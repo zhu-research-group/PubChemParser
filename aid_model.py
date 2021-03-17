@@ -118,35 +118,6 @@ class BioassayResults:
         result['results'] = assay_results
         return result
 
-    def parse_sid(self):
-        sid_node = self.get_node('pc:PC-AssayResults/pc:PC-AssayResults_sid')
-        return [int(sid.text) for sid in sid_node]
-
-    def parse_sid_source(self):
-        sid_names = self.get_node('pc:PC-AssayResults/pc:PC-AssayResults_sid-source/pc:PC-Source/'
-                                            'pc:PC-Source_db/pc:PC-DBTracking/pc:PC-DBTracking_name')
-        return [sid_name.text for sid_name in sid_names]
-
-    def parse_outcome(self):
-        outcome_nodes = self.get_node('pc:PC-AssayResults/pc:PC-AssayResults_outcome')
-        return [{**{'text': oc.text}, **oc.attrib} for oc in outcome_nodes]
-
-    def parse_rank(self):
-        rank_nodes = self.get_node('pc:PC-AssayResults/pc:PC-AssayResults_rank')
-        return [int(rank_node.text) for rank_node in rank_nodes]
-
-    def parse_results_data(self):
-        data_node = self.get_node('pc:PC-AssayResults/pc:PC-AssayResults_data/pc:PC-AssayData')
-        assay_results = []
-        for assaydata in data_node:
-            result_dic = {}
-            result_dic['tid'] = assaydata.find('pc:PC-AssayData_tid', NAMESPACE).text
-            # the PC-AssayData_value container
-            # can have multiple values
-            result_dic['value'] = [val.text for val in assaydata.find('pc:PC-AssayData_value', NAMESPACE)]
-            assay_results.append(result_dic)
-        return assay_results
-
 if __name__ == '__main__':
     import argparse
 
