@@ -92,7 +92,7 @@ class BioassayResults:
         return self.assay_results.findall(path, NAMESPACE)
 
     def parse_results(self):
-        """ generator funciton to iteratively call parse one to parse pubchem results """
+        """ generator function (to save on RAM) to iteratively call parse one to parse pubchem results """
         for result in self.assay_results:
             yield self.parse_one(result)
 
@@ -128,7 +128,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     xmlfile = args.xmlfile
-
 
     tree = ET.parse(xmlfile)
     root = tree.getroot()
