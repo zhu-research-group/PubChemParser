@@ -33,6 +33,10 @@ class Compounds:
             cmps.append(cmp)
         return cmps
 
+    @classmethod
+    def load_compounds(cls, xmlfile):
+        return cls(xmlfile)
+
 class Compound:
 
     def __init__(self, pc_elem):
