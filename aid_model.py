@@ -18,6 +18,12 @@ class Bioassay:
         self.assay = BioassayDesc(xml_root.find('pc:PC-AssaySubmit_assay', NAMESPACE))
         self.assay_results = BioassayResults(xml_root.find('pc:PC-AssaySubmit_data', NAMESPACE))
 
+    @classmethod
+    def load_bioassay(cls, xmlfile):
+
+        tree = ET.parse(xmlfile)
+        root = tree.getroot()
+        return cls(root)
 
 class BioassayDesc:
 
