@@ -18,15 +18,12 @@ class Compounds:
         self.tree = et.iterparse(xmlfile, events=('end',), tag='{http://www.ncbi.nlm.nih.gov}PC-Compound')
 
     def parse_compounds(self):
-
-        cmps = []
-
         for _, pc_elem in self.tree:
 
             cmp = Compound(pc_elem)
             record = cmp.as_record()
-            cmps.append(record)
-        return cmps
+            yield record
+
 
     @classmethod
     def load_compounds(cls, xmlfile):

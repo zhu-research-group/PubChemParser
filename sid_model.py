@@ -25,10 +25,7 @@ class Substances:
             sub = Substance(pc_elem)
 
             record = sub.as_record()
-
-            subs.append(record)
-
-        return subs
+            yield record
 
     @classmethod
     def load_substances(cls, xmlfile):
