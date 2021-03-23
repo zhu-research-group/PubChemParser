@@ -23,14 +23,14 @@ class Compounds:
 
         for _, pc_elem in self.tree:
 
-            cmp = {}
+            cmp_rec = {}
             cmp = Compound(pc_elem)
             cid = cmp.get_cid()
             props = cmp.get_props()
 
-            cmp['cid'] = cid
-            cmp['props'] = props
-            cmps.append(cmp)
+            cmp_rec['cid'] = cid
+            cmp_rec['props'] = props
+            cmps.append(cmp_rec)
         return cmps
 
     @classmethod
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('-f', '--xmlfile', metavar='df', type=str,
-                        help='Name of data file containing cids (as txt)')
+                        help='Name of data file')
 
     args = parser.parse_args()
     xmlfile = args.xmlfile

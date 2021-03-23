@@ -130,7 +130,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('-f', '--xmlfile', metavar='df', type=str,
-                        help='Name of data file containing cids (as txt)')
+                        help='Name of data')
 
     args = parser.parse_args()
     xmlfile = args.xmlfile
