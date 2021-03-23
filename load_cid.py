@@ -19,11 +19,7 @@ for xmlfile in xmlfiles:
 
     records = compounds.parse_compounds()
 
-    if not update:
-        compounds_collection.insert_many(records)
-    else:
-        cids = [record['cid'] for record in records]
-        compounds_collection.update_many({'cid': {'$in': cids}}, {'$set': records}, upsert=True)
-
+    for record in records:
+        compounds_collection.update_many({'_id': record['_id']}, {'$set': record}, upsert=True)
 
 client_db.close()

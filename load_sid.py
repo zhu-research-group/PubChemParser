@@ -3,7 +3,7 @@ from sid_model import Substances
 from config import Config
 import glob, os
 
-update = False
+update = True
 
 client_db = pymongo.MongoClient(Config.HOST, Config.PORT)
 
@@ -19,11 +19,9 @@ for xmlfile in xmlfiles:
 
     records = substances.parse_substances()
 
-    if not update:
-        substances_collection.insert_many(records)
-    else:
-        sids = [record['sid'] for record in records]
-        substances_collection.update_many({'sid': {'$in': sids}}, {'$set': records}, upsert=True)
+    for record in records:
+        substances_collection.update_one({'_id': record['_id']}, {'$set': record}, upsert=True)
+
 
 
 client_db.close()
