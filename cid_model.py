@@ -14,7 +14,7 @@ NAMESPACE = {'pc': 'http://www.ncbi.nlm.nih.gov'}
 
 class Compounds:
 
-    def __init__(self, xml_file):
+    def __init__(self, xmlfile):
         self.tree = et.iterparse(xmlfile, events=('end',), tag='{http://www.ncbi.nlm.nih.gov}PC-Compound')
 
     def parse_compounds(self):
@@ -23,14 +23,9 @@ class Compounds:
 
         for _, pc_elem in self.tree:
 
-            cmp_rec = {}
             cmp = Compound(pc_elem)
-            cid = cmp.get_cid()
-            props = cmp.get_props()
-
-            cmp_rec['cid'] = cid
-            cmp_rec['props'] = props
-            cmps.append(cmp_rec)
+            record = cmp.as_record()
+            cmps.append(record)
         return cmps
 
     @classmethod
@@ -86,6 +81,13 @@ class Compound:
             data_list.append(prop)
 
         return data_list
+
+    def as_record(self):
+        record = {}
+        record['cid'] = self.get_cid()
+        record['_id'] = self.get_cid()
+        record['props'] = self.get_props()
+        return record
 
 if __name__ == '__main__':
     import argparse

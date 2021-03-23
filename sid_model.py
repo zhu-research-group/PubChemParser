@@ -14,7 +14,7 @@ NAMESPACE = {'pc': 'http://www.ncbi.nlm.nih.gov'}
 
 class Substances:
 
-    def __init__(self, xml_file):
+    def __init__(self, xmlfile):
         self.tree = et.iterparse(xmlfile, events=('end',), tag='{http://www.ncbi.nlm.nih.gov}PC-Substance')
 
     def parse_substances(self):
@@ -22,16 +22,11 @@ class Substances:
         subs = []
 
         for _, pc_elem in self.tree:
-
-            sub_rec = {}
             sub = Substance(pc_elem)
-            sid = sub.get_sid()
-            cids = sub.get_cids()
 
-            sub_rec['sid'] = sid
-            sub_rec['cids'] = cids
+            record = sub.as_record()
 
-            subs.append(sub_rec)
+            subs.append(record)
 
         return subs
 
@@ -60,8 +55,14 @@ class Substance:
     def get_cids(self):
         cid_nodes = self.get_nodes('pc:PC-Substance_compound/pc:PC-Compounds/pc:PC-Compound/pc:PC-Compound_id'
                                    '/pc:PC-CompoundType/pc:PC-CompoundType_id/pc:PC-CompoundType_id_cid')
-        print(cid_nodes)
         return [int(cid_node.text) for cid_node in cid_nodes]
+
+    def as_record(self):
+        record = {}
+        record['sid'] = self.get_sid()
+        record['_id'] = self.get_sid()
+        record['cids'] = self.get_cids()
+        return record
 
 if __name__ == '__main__':
     import argparse

@@ -87,7 +87,16 @@ class BioassayDesc:
         """ e.g., confirmatory, summary, etc. """
         pass
 
+    def as_record(self):
+        """ returns as a record suitable for adding to a MongoDB """
 
+        record = {}
+        record['aid'] = self.get_aid()
+        record['name'] = self.get_name()
+        record['description'] = self.get_description()
+        record['_id'] = self.get_aid()
+        record['result_types'] = self.get_result_types()
+        return record
 
 class BioassayResults:
     def __init__(self, assay_results):
@@ -123,6 +132,7 @@ class BioassayResults:
             assay_results.append(result_dic)
         result['results'] = assay_results
         return result
+
 
 if __name__ == '__main__':
     import argparse
