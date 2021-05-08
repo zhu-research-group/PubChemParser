@@ -2,15 +2,18 @@ import pymongo
 from aid_model import Bioassay
 from config import Config
 import glob, os
+from connector import connect_to_db
 
-client_db = pymongo.MongoClient(Config.HOST, Config.PORT)
-
+client_db = connect_to_db()
 db = getattr(client_db, Config.DB)
 
 bioassays_collection = getattr(db, Config.BIOASSAY_COLLECTION)
 results_collection = getattr(db, Config.BIOASSAY_RESULTS_COLLECTION)
 
-xmlfiles = glob.glob(os.path.join(Config.BIOASSAY_DIRECTORY, '*.xml'))
+xmlfiles = glob.glob(os.path.join(Config.BIOASSAY_DIRECTORY, '*', '*.xml'))
+
+total_files = len(xmlfiles)
+total_loaded = 0
 
 for xmlfile in xmlfiles:
 
@@ -31,5 +34,7 @@ for xmlfile in xmlfiles:
 
         results_collection.update_one(key, {'$set': record}, upsert=True)
 
+    total_loaded += 1
+    print('{:.2} files loaded'.format(total_loaded/total_files))
 
 client_db.close()
