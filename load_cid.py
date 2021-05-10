@@ -14,11 +14,17 @@ xmlfiles = glob.glob(os.path.join(Config.COMPOUND_DIRECTORY, 'Compound_*.xml'))
 total_files = len(xmlfiles)
 total_loaded = 0
 
+log_file = open('load_cid..log', 'w+')
+
+log_file.write('{},{}\n'.format('file', 'error'))
+
 for xmlfile in xmlfiles:
 
-    compounds = Compounds.load_compounds(xmlfile)
-
-    records = compounds.parse_compounds()
+    try:
+        compounds = Compounds.load_compounds(xmlfile)
+        records = compounds.parse_compounds()
+    except Exception as e:
+        log_file.write('{},{}\n'.format(xmlfile, e))
 
     for record in records:
         compounds_collection.update_many({'_id': record['_id']}, {'$set': record}, upsert=True)
