@@ -40,9 +40,12 @@ for json_file in bioassay_json_files:
         # as the identifier
         assay_desc['_id'] = {'aid': aid}
 
-        for result in assay_data:
+        for i, result in enumerate(assay_data):
             # store aid/sid pairs as ids for results
-            _id = {'_id': {'aid': assay_desc['_id']['aid'], 'sid': result['sid']}}
+            # there are duplicate aid/sid combos in
+            # certain assays so the idx id should
+            # make every response unique
+            _id = {'_id': {'aid': assay_desc['_id']['aid'], 'sid': result['sid']}, 'idx': i}
             result.update(_id)
 
         # dump both to target directory
