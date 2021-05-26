@@ -1,15 +1,17 @@
 """
 script to convert the native Json files offered through
 the PubChem FTP service to ones that can be inserted into
-the Mongo DB
-
+the Mongo DB.  It splits a PubChem JSON file for a given
+AID into two parts: the bioassay description and the
+bioassay results.
 """
 
 import gzip
 import json
 import os
+import glob
 
-bioassay_json_files = ['data/json/1.json.gz']
+bioassay_json_files = glob.glob('data/json/*.json.gz')
 target_dir = 'data/parsed_json'
 
 if not os.path.exists(target_dir):
