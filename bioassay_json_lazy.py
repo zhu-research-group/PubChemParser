@@ -13,7 +13,7 @@ import glob
 import ntpath
 import sys, decimal
 
-bioassay_json_files = glob.glob('/g5/home/danrusso/pc/json/bioassay/*/*.json.gz')
+bioassay_json_files = glob.glob('/g5/home/danrusso/pc/json/bioassay/*/*.json')
 print(len(bioassay_json_files))
 target_dir = '/lustre/scratch/danrusso/json/parsed_bioassay'
 
@@ -29,7 +29,7 @@ def decimal_default(obj):
 
 for json_file in bioassay_json_files:
 
-
+    try:
         json_file_obj = open(json_file, 'r')
         assay_desc_objs = ijson.items(json_file_obj, 'PC_AssaySubmit.assay')
         assay_desc = list(assay_desc_objs)[0]
@@ -71,17 +71,17 @@ for json_file in bioassay_json_files:
             f.write(']')
             f.close()
 
+        json_file_obj.close()
 
 
-    #
-    # except:
-    #     error = sys.exc_info()[0]
-    #     aid_file = ntpath.basename(json_file)
-    #     errors.append([error, aid_file])
-#
-# error_file = os.path.join(target_dir, 'parse.log')
-# with open(error_file, 'w', encoding='utf-8') as f:
-#     for row in errors:
-#         error = row[0]
-#         json_file = row[1]
-#         f.write('{}: {}\n'.format(error, json_file))
+    except:
+        error = sys.exc_info()[0]
+        aid_file = ntpath.basename(json_file)
+        errors.append([error, aid_file])
+
+error_file = os.path.join(target_dir, 'parse.log')
+with open(error_file, 'w', encoding='utf-8') as f:
+    for row in errors:
+        error = row[0]
+        json_file = row[1]
+        f.write('{}: {}\n'.format(error, json_file))
