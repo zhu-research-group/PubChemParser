@@ -13,9 +13,23 @@ import glob
 import ntpath
 import sys
 
-bioassay_json_files = glob.glob('/g5/home/danrusso/pc/json/bioassay/*/*.json.gz')
+import pymongo
+from sid_model import Substances
+from config import Config
+import glob, os
+from connector import connect_to_db
+
+client_db = connect_to_db()
+db = getattr(client_db, Config.DB)
+results_collection = getattr(db, Config.BIOASSAY_RESULTS_COLLECTION)
+assay_collection = getattr(db, Config.BIOASSAY_COLLECTION)
+
+
+bioassay_json_files = glob.glob('/Volumes/Seagate Expansion Drive/pubchem/bioassay/JSON/*/*/*.json')
+total_files = len(bioassay_json_files)
 print(len(bioassay_json_files))
-target_dir = '/lustre/scratch/danrusso/json/parsed_bioassay'
+counter = 0
+target_dir = '/Volumes/Seagate Expansion Drive/pubchem/bioassay'
 
 errors = []
 
@@ -48,15 +62,11 @@ for json_file in bioassay_json_files:
             _id = {'_id': {'aid': assay_desc['_id']['aid'], 'sid': result['sid'], 'idx': i}}
             result.update(_id)
 
-        # dump both to target directory
-        desc_file = os.path.join(target_dir, '{}_desc.json'.format(aid))
-        with open(desc_file, 'w', encoding='utf-8') as f:
-            json.dump(assay_desc, f, ensure_ascii=False, indent=4)
+        for result in assay_data:
+            results_collection.update_one({'_id': result['_id']}, result)
 
-
-        results_file = os.path.join(target_dir, '{}_results.json'.format(aid))
-        with open(results_file, 'w', encoding='utf-8') as f:
-            json.dump(assay_data, f, ensure_ascii=False, indent=4)
+        assay_collection.update_one({'_id': assay_desc['_id']}, assay_desc)
+        print("added {} of bioassays}".format(counter/total_files))
     except:
         error = sys.exc_info()[0]
         aid_file = ntpath.basename(json_file)
