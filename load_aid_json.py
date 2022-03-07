@@ -25,16 +25,10 @@ results_collection = getattr(db, Config.BIOASSAY_RESULTS_COLLECTION)
 assay_collection = getattr(db, Config.BIOASSAY_COLLECTION)
 
 
-bioassay_json_files = glob.glob('/Volumes/Seagate Expansion Drive/pubchem/bioassay/JSON/*/*/*.json')
+bioassay_json_files = glob.glob(r'E:\pubchem\bioassay\Concise\JSON\all\*\*.json.gz')
 total_files = len(bioassay_json_files)
-print(len(bioassay_json_files))
-counter = 0
-target_dir = '/Volumes/Seagate Expansion Drive/pubchem/bioassay'
 
-errors = []
 
-if not os.path.exists(target_dir):
-    os.mkdir(target_dir)
 
 for json_file in bioassay_json_files:
     try:
@@ -50,31 +44,31 @@ for json_file in bioassay_json_files:
 
         aid = assay_desc['descr']['aid']['id']
 
-        # for the assay desc store
-        # as the identifier
-        assay_desc['_id'] = {'aid': aid}
-
-        for i, result in enumerate(assay_data):
-            # store aid/sid pairs as ids for results
-            # there are duplicate aid/sid combos in
-            # certain assays so the idx id should
-            # make every response unique
-            _id = {'_id': {'aid': assay_desc['_id']['aid'], 'sid': result['sid'], 'idx': i}}
-            result.update(_id)
-
-        for result in assay_data:
-            results_collection.update_one({'_id': result['_id']}, result)
-
-        assay_collection.update_one({'_id': assay_desc['_id']}, assay_desc)
-        print("added {} of bioassays}".format(counter/total_files))
-    except:
-        error = sys.exc_info()[0]
-        aid_file = ntpath.basename(json_file)
-        errors.append([error, aid_file])
-
-error_file = os.path.join(target_dir, 'parse.log')
-with open(error_file, 'w', encoding='utf-8') as f:
-    for row in errors:
-        error = row[0]
-        json_file = row[1]
-        f.write('{}: {}\n'.format(error, json_file))
+#         # for the assay desc store
+#         # as the identifier
+#         assay_desc['_id'] = {'aid': aid}
+#
+#         for i, result in enumerate(assay_data):
+#             # store aid/sid pairs as ids for results
+#             # there are duplicate aid/sid combos in
+#             # certain assays so the idx id should
+#             # make every response unique
+#             _id = {'_id': {'aid': assay_desc['_id']['aid'], 'sid': result['sid'], 'idx': i}}
+#             result.update(_id)
+#
+#         for result in assay_data:
+#             results_collection.update_one({'_id': result['_id']}, result)
+#
+#         assay_collection.update_one({'_id': assay_desc['_id']}, assay_desc)
+#         print("added {} of bioassays}".format(counter/total_files))
+#     except:
+#         error = sys.exc_info()[0]
+#         aid_file = ntpath.basename(json_file)
+#         errors.append([error, aid_file])
+#
+# error_file = os.path.join(target_dir, 'parse.log')
+# with open(error_file, 'w', encoding='utf-8') as f:
+#     for row in errors:
+#         error = row[0]
+#         json_file = row[1]
+#         f.write('{}: {}\n'.format(error, json_file))
