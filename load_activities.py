@@ -17,6 +17,8 @@ session = Session()
 
 failed_files = []
 
+activities_to_load = []
+
 for f in ASSAY_FILES:
     try:
         assay_results = pd.read_csv(f).iloc[2:]

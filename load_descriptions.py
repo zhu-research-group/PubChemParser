@@ -24,33 +24,41 @@ session = Session()
 
 assays_to_add = []
 
+
+failed_files = []
+
 for json_file in ASSAY_FILES:
 
-    json_file_obj = open(json_file, 'r')
-    assay_desc_objs = ijson.items(json_file_obj, 'PC_AssaySubmit.assay')
-    assay_desc = list(assay_desc_objs)[0]
-
-
-    aid = assay_desc['descr']['aid']['id']
-    name = assay_desc['descr']['name']
-    description = assay_desc['descr']['description']
-    source = assay_desc['descr']['aid_source']['db']['name']
     try:
-        outcome_method = assay_desc['descr']['activity_outcome_method']
-    except KeyError:
-        outcome_method = None
+        json_file_obj = open(json_file, 'r')
+        assay_desc_objs = ijson.items(json_file_obj, 'PC_AssaySubmit.assay')
+        assay_desc = list(assay_desc_objs)[0]
 
 
+        aid = assay_desc['descr']['aid']['id']
+        name = assay_desc['descr']['name']
+        description = assay_desc['descr']['description']
+        source = assay_desc['descr']['aid_source']['db']['name']
+        try:
+            outcome_method = assay_desc['descr']['activity_outcome_method']
+        except KeyError:
+            outcome_method = None
+        assay = Assay(aid=aid,
+                      name=name,
+                      description=description,
+                      source=source,
+                      outcome_method=outcome_method)
 
+        assays_to_add.append(assay)
+    except:
+        failed_files.append(json_file)
 
-    assay = Assay(aid=aid,
-                  name=name,
-                  description=description,
-                  source=source,
-                  outcome_method=outcome_method)
-
-    assays_to_add.append(assay)
 
 session.add_all(assays_to_add)
 session.commit()
 
+f = open('description_errors.txt', 'w')
+
+for failed_file in failed_files:
+    f.write(failed_file + '\n')
+f.close()
