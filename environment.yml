@@ -1,0 +1,10 @@
+name: PubChemParser
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - ijson=3.1.4
+  - pandas=1.1.5
+  - rdkit=2021.03.5
+  - sqlalchemy=1.4.22
+  - sqlite=3.37.2
