@@ -37,7 +37,7 @@ for json_file in ASSAY_FILES:
 
         aid = assay_desc['descr']['aid']['id']
         name = assay_desc['descr']['name']
-        description = assay_desc['descr']['description']
+        description = ' '.join(assay_desc['descr']['description'])
         source = assay_desc['descr']['aid_source']['db']['name']
         try:
             outcome_method = assay_desc['descr']['activity_outcome_method']

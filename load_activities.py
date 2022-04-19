@@ -6,7 +6,7 @@ from zipfile import ZipFile
 import gzip
 from rdkit import Chem
 from sqldb import Activity, engine
-import ntpath
+import ntpath, os
 
 
 ASSAY_FILES = glob.glob(r"E:\pubchem\bioassay\Concise\CSV\Data\all\*\*.csv")
@@ -20,6 +20,11 @@ failed_files = []
 activities_to_load = []
 
 for f in ASSAY_FILES:
+    aid = int(ntpath.basename(f).split('.')[0])
+    print("on {}".format(aid))
+    aid_exists = session.query(Activity.aid).filter_by(aid=aid).first()
+    if aid_exists:
+        continue
     try:
         assay_results = pd.read_csv(f).iloc[2:]
         results_to_add = []
@@ -40,6 +45,7 @@ for f in ASSAY_FILES:
                 results_to_add.append(act)
     except:
         failed_files.append(f)
+        continue
 
     session.add_all(results_to_add)
     session.commit()

@@ -90,4 +90,4 @@ class Assay(Base):
     source = Column('source', String)
     outcome_method = Column('outcome_method', Integer)
 
-Base.metadata.create_all(engine)
+#Base.metadata.create_all(engine)
