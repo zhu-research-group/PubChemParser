@@ -6,7 +6,7 @@ from zipfile import ZipFile
 import gzip
 from rdkit import Chem
 from sqldb import Activity, engine
-import ntpath, os
+import ntpath, os, sys
 
 
 ASSAY_FILES = glob.glob(r"E:\pubchem\bioassay\Concise\CSV\Data\all\*\*.csv")
@@ -26,7 +26,15 @@ for f in ASSAY_FILES:
     if aid_exists:
         continue
     try:
-        assay_results = pd.read_csv(f).iloc[2:]
+        # the first n rows are a header
+        # that describes the data
+        # dose response example is 434931
+        assay_results = pd.read_csv(f, error_bad_lines=False)
+
+        # find index where header stops
+        idx = assay_results[assay_results.PUBCHEM_RESULT_TAG == '1'].index[0]
+        assay_results = assay_results.loc[idx:]
+
         results_to_add = []
         aid = int(ntpath.basename(f).split('.')[0])
 
@@ -38,13 +46,14 @@ for f in ASSAY_FILES:
 
                 outcome = data['PUBCHEM_ACTIVITY_OUTCOME']
                 score = data['PUBCHEM_ACTIVITY_SCORE']
-                result_tag = data['PUBCHEM_RESULT_TAG']
+                result_tag = data.get('PUBCHEM_RESULT_TAG')
 
                 act = Activity(cid=cid, sid=sid, aid=aid, outcome=outcome, score=score, result_tag=result_tag)
 
                 results_to_add.append(act)
     except:
-        failed_files.append(f)
+        error = sys.exc_info()[0]
+        failed_files.append((f, error))
         continue
 
     session.add_all(results_to_add)
@@ -52,6 +61,6 @@ for f in ASSAY_FILES:
 
 f = open('errors.txt', 'w')
 
-for failed_file in failed_files:
-    f.write(failed_file + '\n')
+for failed_file, error in failed_files:
+    f.write(failed_file + '\t' + str(error) + '\n')
 f.close()
