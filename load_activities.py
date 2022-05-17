@@ -22,9 +22,9 @@ activities_to_load = []
 for f in ASSAY_FILES:
     aid = int(ntpath.basename(f).split('.')[0])
     print("on {}".format(aid))
-    aid_exists = session.query(Activity.aid).filter_by(aid=aid).first()
-    if aid_exists:
-        continue
+    # aid_exists = session.query(Activity.aid).filter_by(aid=aid).first()
+    # if aid_exists:
+    #     continue
     try:
         # the first n rows are a header
         # that describes the data
@@ -47,6 +47,11 @@ for f in ASSAY_FILES:
                 outcome = data['PUBCHEM_ACTIVITY_OUTCOME']
                 score = data['PUBCHEM_ACTIVITY_SCORE']
                 result_tag = data.get('PUBCHEM_RESULT_TAG')
+
+                result_exists = session.query(Activity.aid).filter_by(cid=cid, sid=sid, aid=aid, result_tag=result_tag).first()
+                if result_exists:
+                    print("Skipping")
+                    continue
 
                 act = Activity(cid=cid, sid=sid, aid=aid, outcome=outcome, score=score, result_tag=result_tag)
 
