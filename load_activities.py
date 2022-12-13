@@ -9,8 +9,8 @@ from sqldb import Activity, engine
 import ntpath, os, sys
 
 
-ASSAY_FILES = glob.glob(r"E:\pubchem\bioassay\Concise\CSV\Data\all\*\*.csv")
-
+ASSAY_FILES = glob.glob(r"G:\Shared drives\ZhuLab\DATA\PUBCHEM\concise\CSV\Data\Data\all\*\*.concise.csv.gz")
+print(len(ASSAY_FILES))
 Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()
@@ -29,7 +29,7 @@ for f in ASSAY_FILES:
         # the first n rows are a header
         # that describes the data
         # dose response example is 434931
-        assay_results = pd.read_csv(f, error_bad_lines=False)
+        assay_results = pd.read_csv(f, error_bad_lines=False, compression='gz')
 
         # find index where header stops
         idx = assay_results[assay_results.PUBCHEM_RESULT_TAG == '1'].index[0]

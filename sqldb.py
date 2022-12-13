@@ -15,7 +15,7 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
-engine = create_engine(r"sqlite:///E://pubchem//pubchem.db")
+engine = create_engine(r"sqlite:///G:\Shared drives\ZhuLab\DATA\PUBCHEM\concise\CSV\Data\Data\all\pubchem_concise.db")
 
 
 # class AssayData(Base):
