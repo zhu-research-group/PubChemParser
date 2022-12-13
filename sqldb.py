@@ -8,14 +8,14 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import func
 
 import pandas as pd
-
+import os
 
 from sqlalchemy import Column, Integer, String, Float, Table
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-
-engine = create_engine(r"sqlite:///G:\Shared drives\ZhuLab\DATA\PUBCHEM\concise\CSV\Data\Data\all\pubchem_concise.db")
+sqlite_uri = r"sqlite:///{}/PUBCHEM_CONCISE.db".format(os.getenv('PUBCHEM_SQLITE_DIR'))
+engine = create_engine(sqlite_uri)
 
 
 # class AssayData(Base):
@@ -47,7 +47,7 @@ engine = create_engine(r"sqlite:///G:\Shared drives\ZhuLab\DATA\PUBCHEM\concise\
 
 class Compound(Base):
     """ main table to hold a users' datasets """
-    __tablename__ = 'compounds'
+    __tablename__ = 'Compound'
     cid = Column('cid', Integer, primary_key=True)
     inchi = Column('inchi', String, index=True)
     smiles = Column('smiles', Integer, index=True)
@@ -64,7 +64,7 @@ class Compound(Base):
 
 class Activity(Base):
     """ main table to hold a users' datasets """
-    __tablename__ = 'activities'
+    __tablename__ = 'Activity'
     id = Column('id', Integer, primary_key=True)
     cid = Column('cid', Integer)
     sid = Column('sid', Integer)
@@ -82,7 +82,7 @@ class Activity(Base):
     #     self.result_tag = result_tag
 
 class Assay(Base):
-    __tablename__ = 'assays'
+    __tablename__ = 'Assay'
     aid = Column('aid', Integer, primary_key=True)
 
     description = Column('description', String)
@@ -90,4 +90,4 @@ class Assay(Base):
     source = Column('source', String)
     outcome_method = Column('outcome_method', Integer)
 
-#Base.metadata.create_all(engine)
+Base.metadata.create_all(engine)
