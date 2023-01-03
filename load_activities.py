@@ -74,8 +74,6 @@ for f in tqdm.tqdm(ASSAY_FILES):
         }
 
         assay_results = assay_results.rename(columns=mapper)
-
-
         results_to_add = results_to_add + assay_results.to_dict('records')
 
         if len(results_to_add) >= batch_size:
