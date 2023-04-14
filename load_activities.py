@@ -55,7 +55,7 @@ with open('errors.txt', 'w') as text_file:
             # the first n rows are a header
             # that describes the data
             # dose response example is 434931
-            assay_results = pd.read_csv(f, on_bad_lines='skip', compression="gzip")
+            assay_results = pd.read_csv(f, error_bad_lines='skip', compression="gzip")
 
             # find index where header stops
             idx = assay_results[assay_results.PUBCHEM_RESULT_TAG == '1'].index[0]

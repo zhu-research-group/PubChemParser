@@ -14,7 +14,7 @@ from sqlalchemy import Column, Integer, String, Float, Table
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-sqlite_uri = r"sqlite:///{}/PUBCHEM_CONCISE.db".format(os.getenv('PUBCHEM_SQLITE_DIR'))
+sqlite_uri = r"sqlite:///{}/PUBCHEM_CONCISE3.db".format(os.getenv('PUBCHEM_SQLITE_DIR'))
 engine = create_engine(sqlite_uri)
 
 
@@ -59,7 +59,7 @@ class Compound(Base):
     def __init__(self, cid, inchi, smiles):
         self.cid = cid
         self.inchi = inchi
-        self.smiles = smiles
+        #self.smiles = smiles
 
 
 class Activity(Base):
