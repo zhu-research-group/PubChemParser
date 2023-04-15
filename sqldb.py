@@ -14,7 +14,7 @@ from sqlalchemy import Column, Integer, String, Float, Table
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
-sqlite_uri = r"sqlite:///{}/PUBCHEM_CONCISE3.db".format(os.getenv('PUBCHEM_SQLITE_DIR'))
+sqlite_uri = r"sqlite:///{}/PUBCHEM_CONCISE2.db".format(os.getenv('PUBCHEM_SQLITE_DIR'))
 engine = create_engine(sqlite_uri)
 
 

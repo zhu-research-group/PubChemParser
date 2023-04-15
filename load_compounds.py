@@ -1,16 +1,15 @@
-import os, glob
-
+import glob
 import numpy as np
-import pandas as pd
 from sqlalchemy.orm import sessionmaker
-from zipfile import ZipFile
-import gzip
-#from rdkit import Chem
 from sqldb import Compound, engine
-import ntpath, os, sys, tqdm
-import xml.etree.ElementTree as ET
+import os, tqdm
 import gzip
 from rdkit import Chem
+from rdkit import RDLogger
+
+# ignore warnings: https://github.com/rdkit/rdkit/issues/2683
+RDLogger.DisableLog('rdApp.*')
+
 
 FILES = sorted(glob.glob(os.path.join(os.getenv('PUBCHEM_COMPOUND_FILES'), '*.sdf.gz')))
 print(f"There are {len(FILES)} folders")
@@ -47,8 +46,6 @@ cids = []
 
 with open('errors.txt', 'w') as text_file:
     for f in tqdm.tqdm(FILES):
-
-
             with gzip.open(f, 'r') as inf:
                 suppl = Chem.ForwardSDMolSupplier(inf)
                 for mol in suppl:
@@ -58,8 +55,8 @@ with open('errors.txt', 'w') as text_file:
                         smiles = Chem.MolToSmiles(mol)
                     else:
                         error = 'bad mol'
-                        text_file.write(f + '\t' + str(error) + '\n')
-                        failed_files.append((f, error))
+                        text_file.write(str(cid) + '\t' + str(error) + '\n')
+                        failed_files.append((str(cid), error))
 
 
                     results_to_add = results_to_add + [{'cid': cid, 'inchi':inchi, 'smiles':smiles}]
