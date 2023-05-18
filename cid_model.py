@@ -6,23 +6,23 @@ package for iterative parsing bc
 the xml files typically tend to be huge.
 
 """
+import gzip
 import xml.etree.cElementTree as ET
 import lxml.etree as et
-
+import pandas as pd
 
 NAMESPACE = {'pc': 'http://www.ncbi.nlm.nih.gov'}
 
 class Compounds:
 
     def __init__(self, xmlfile):
-        self.tree = et.iterparse(xmlfile, events=('end',), tag='{http://www.ncbi.nlm.nih.gov}PC-Compound')
+        self.tree = et.iterparse(gzip.GzipFile(xmlfile), events=('end',), tag='{http://www.ncbi.nlm.nih.gov}PC-Compound')
 
     def parse_compounds(self):
         for _, pc_elem in self.tree:
 
             cmp = Compound(pc_elem)
-            record = cmp.as_record()
-            yield record
+            yield cmp
 
 
     @classmethod
@@ -43,6 +43,20 @@ class Compound:
     def get_cid(self):
         cid_node = self.get_node('pc:PC-Compound_id/pc:PC-CompoundType/pc:PC-CompoundType_id/pc:PC-CompoundType_id_cid')
         return int(cid_node.text)
+
+    def get_inchi(self):
+        info_data = self.get_nodes('pc:PC-Compound_props/pc:PC-InfoData')
+        inchi = None
+        for info_datum in info_data:
+
+            label = info_datum.find('pc:PC-InfoData_urn/pc:PC-Urn/pc:PC-Urn_label', NAMESPACE)
+            if label is not None:
+                label = label.text
+                if label == 'InChI':
+                    value = info_datum.find('pc:PC-InfoData_value', NAMESPACE)[0]
+                    if value is not None:
+                        inchi = value.text
+                    return inchi
 
     def get_props(self):
         info_data = self.get_nodes('pc:PC-Compound_props/pc:PC-InfoData')
@@ -87,17 +101,20 @@ class Compound:
         return record
 
 if __name__ == '__main__':
-    import argparse
+    import argparse, os
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('-f', '--xmlfile', metavar='df', type=str,
+    parser.add_argument('-f', '--xmlfile', metavar='f', type=str,
                         help='Name of data file')
 
     args = parser.parse_args()
     xmlfile = args.xmlfile
 
+
+
     compounds = Compounds(xmlfile)
     prop = compounds.parse_compounds()
-
+    for cmp in prop:
+        print(cmp.get_cid(), cmp.get_inchi())
 

@@ -3,15 +3,16 @@ import numpy as np
 from sqlalchemy.orm import sessionmaker
 from sqldb import Compound, engine
 import os, tqdm
-import gzip
+import gzip, shutil
 from rdkit import Chem
 from rdkit import RDLogger
+from cid_model import Compounds
 
 # ignore warnings: https://github.com/rdkit/rdkit/issues/2683
 RDLogger.DisableLog('rdApp.*')
 
 
-FILES = sorted(glob.glob(os.path.join(os.getenv('PUBCHEM_COMPOUND_FILES'), '*.sdf.gz')))
+FILES = sorted(glob.glob(os.path.join(os.getenv('PUBCHEM_COMPOUND_FILES'), '*.xml.gz')))
 print(f"There are {len(FILES)} folders")
 print(FILES)
 
@@ -23,6 +24,9 @@ print(FILES)
 Session = sessionmaker()
 Session.configure(bind=engine)
 session = Session()
+
+session.query(Compound).delete()
+session.commit()
 
 failed_files = []
 
@@ -44,30 +48,28 @@ current_batch_size = 0
 results_to_add = []
 cids = []
 
+
 with open('errors.txt', 'w') as text_file:
-    for f in tqdm.tqdm(FILES):
-        with gzip.open(f, 'r') as inf:
-            suppl = Chem.ForwardSDMolSupplier(inf)
-            for mol in suppl:
-                if mol:
-                    cid = int(mol.GetProp('PUBCHEM_COMPOUND_CID'))
-                    inchi = Chem.MolToInchi(mol)
-                    smiles = Chem.MolToSmiles(mol)
-                else:
-                    error = 'bad mol'
-                    text_file.write(str(cid) + '\t' + str(error) + '\n')
-                    failed_files.append((str(cid), error))
-                    continue
+    for xmlfile in tqdm.tqdm(FILES):
+        try:
+            compounds = Compounds(xmlfile)
+            prop = compounds.parse_compounds()
+        except:
+            print("error: ", xmlfile)
+            continue
 
+        for cmp in prop:
+            cid = cmp.get_cid()
+            inchi = cmp.get_inchi()
 
-                results_to_add = results_to_add + [{'cid': cid, 'inchi':inchi, 'smiles':smiles}]
-                cids.append(cid)
+            results_to_add = results_to_add + [{'cid': cid, 'inchi':inchi, 'smiles': np.nan}]
+            cids.append(cid)
 
-                if len(results_to_add) >= batch_size:
-                    engine.execute(Compound.__table__.insert(), results_to_add)
-                    results_to_add = []
-                    session.commit()
-                    print(np.unique(np.asarray(cids)).shape[0])
+            if len(results_to_add) >= batch_size:
+                engine.execute(Compound.__table__.insert(), results_to_add)
+                results_to_add = []
+                session.commit()
+                print(np.unique(np.asarray(cids)).shape[0])
 
 
     engine.execute(Compound.__table__.insert(), results_to_add)
